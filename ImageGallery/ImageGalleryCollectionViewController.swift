@@ -8,9 +8,11 @@
 
 import UIKit
 
-private let reuseIdentifier = "Cell"
+private let reuseIdentifier = "ImageCell"
 
-class ImageGalleryCollectionViewController: UICollectionViewController {
+class ImageGalleryCollectionViewController: UICollectionViewController, UICollectionViewDropDelegate, UIDropInteractionDelegate {
+
+    var images = [UIImage?]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,35 +24,32 @@ class ImageGalleryCollectionViewController: UICollectionViewController {
         self.collectionView!.register(UICollectionViewCell.self, forCellWithReuseIdentifier: reuseIdentifier)
 
         // Do any additional setup after loading the view.
+        
+        //self.collectionView.dragDelegate = self
+        self.collectionView.dropDelegate = self
+        
+        let dropInteraction = UIDropInteraction(delegate: self)
+        self.collectionView.addInteraction(dropInteraction)
     }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using [segue destinationViewController].
-        // Pass the selected object to the new view controller.
-    }
-    */
 
     // MARK: UICollectionViewDataSource
 
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 0
+        return 1
     }
 
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of items
-        return 0
+        return images.count
     }
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath)
-    
-        // Configure the cell
+        if let imageGalleryCell = cell as? ImageGalleryCollectionViewCell {
+            if let imageForCell = images[indexPath.row] {
+                imageGalleryCell.image.image = imageForCell
+            }
+        }
     
         return cell
     }
@@ -86,4 +85,127 @@ class ImageGalleryCollectionViewController: UICollectionViewController {
     }
     */
 
+    // MARK: - Image Fetcher && Drag and Drop
+    
+//    func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+//        <#code#>
+//    }
+    
+/// 1
+    func collectionView(_ collectionView: UICollectionView, canHandle session: UIDropSession) -> Bool {
+        return session.canLoadObjects(ofClass: NSURL.self) && session.canLoadObjects(ofClass: UIImage.self)
+    }
+    
+/// 2
+    func collectionView(_ collectionView: UICollectionView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
+        return UICollectionViewDropProposal(operation: .copy)
+    }
+    
+/// 3
+    func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
+        
+    }
+    
+//    func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
+//
+//        let destinationIndexPath = coordinator.destinationIndexPath ?? IndexPath(item: 0, section: 0)
+//        for item in coordinator.items {
+//            if let sourceIndexPath = item.sourceIndexPath {
+//                if let image = item.dragItem.localObject as? UIImage {
+//                    collectionView.performBatchUpdates({
+//                        images.remove(at: sourceIndexPath.item)
+//                        images.insert(image, at: destinationIndexPath.item)
+//                        collectionView.deleteItems(at: [sourceIndexPath])
+//                        collectionView.insertItems(at: [destinationIndexPath])
+//                    }) //, completion: <#T##((Bool) -> Void)?##((Bool) -> Void)?##(Bool) -> Void#>)
+//                    coordinator.drop(item.dragItem, toItemAt: destinationIndexPath)
+//                }
+//            }
+//        }
+//    }
+    
+    // MARK: Fetch Image
+    
+    private func fetch(_ url: URL) {
+        //      spinner?.startAnimating()
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            let data = try? Data(contentsOf: url.imageURL)
+            
+            // check if this image is still needed
+            
+//            DispatchQueue.main.async {
+//                if let imageData = urlContents, url == self?.imageURL {
+//                    self? .image = UIImage(data: imageData)
+//                }
+//            }
+        }
+    }
+}
+
+
+// MARK: - EXTENSIONS
+
+extension URL {
+    var imageURL: URL {
+        if let url = UIImage.urlToStoreLocallyAsJPEG(named: self.path) {
+            // this was created using UIImage.storeLocallyAsJPEG
+            return url
+        } else {
+            // check to see if there is an embedded imgurl reference
+            for query in query?.components(separatedBy: "&") ?? [] {
+                let queryComponents = query.components(separatedBy: "=")
+                if queryComponents.count == 2 {
+                    if queryComponents[0] == "imgurl", let url = URL(string: queryComponents[1].removingPercentEncoding ?? "") {
+                        return url
+                    }
+                }
+            }
+            return self.baseURL ?? self
+        }
+    }
+}
+
+extension UIImage
+{
+    private static let localImagesDirectory = "UIImage.storeLocallyAsJPEG"
+    
+    static func urlToStoreLocallyAsJPEG(named: String) -> URL? {
+        var name = named
+        let pathComponents = named.components(separatedBy: "/")
+        if pathComponents.count > 1 {
+            if pathComponents[pathComponents.count-2] == localImagesDirectory {
+                name = pathComponents.last!
+            } else {
+                return nil
+            }
+        }
+        if var url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
+            url = url.appendingPathComponent(localImagesDirectory)
+            do {
+                try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+                url = url.appendingPathComponent(name)
+                if url.pathExtension != "jpg" {
+                    url = url.appendingPathExtension("jpg")
+                }
+                return url
+            } catch let error {
+                print("UIImage.urlToStoreLocallyAsJPEG \(error)")
+            }
+        }
+        return nil
+    }
+    
+    func storeLocallyAsJPEG(named name: String) -> URL? {
+        if let imageData = self.jpegData(compressionQuality: 1.0) {
+            if let url = UIImage.urlToStoreLocallyAsJPEG(named: name) {
+                do {
+                    try imageData.write(to: url)
+                    return url
+                } catch let error {
+                    print("UIImage.storeLocallyAsJPEG \(error)")
+                }
+            }
+        }
+        return nil
+    }
 }
