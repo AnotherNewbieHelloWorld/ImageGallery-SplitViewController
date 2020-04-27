@@ -118,6 +118,7 @@ class ImageGalleryCollectionViewController: UICollectionViewController, UICollec
                         // save the URL
                         
                         // move it to the function
+                        // func fetchImage(withUrl: url) will return true/false
                         DispatchQueue.main.async {
                             if let data = try? Data(contentsOf: url.imageURL) {
                                 if let imageToInsert = UIImage(data: data) {
@@ -125,7 +126,7 @@ class ImageGalleryCollectionViewController: UICollectionViewController, UICollec
                                         self.images.insert(imageToInsert, at: insertionIndexPath.item)
                                     }
                                 } else {
-                                    print(error?.localizedDescription)
+                                    print(error?.localizedDescription ?? "Error")
                                     placeholderContext.deletePlaceholder()
                                 }
                             }
