@@ -24,11 +24,7 @@ class ImageGalleryCollectionViewController: UICollectionViewController, UICollec
         super.viewWillTransition(to: size, with: coordinator)
         flowLayout?.invalidateLayout()
     }
-    
-    var flowLayout: UICollectionViewFlowLayout? {
-        collectionView?.collectionViewLayout as? UICollectionViewFlowLayout
-    }
-    
+
     // MARK: - UICollectionViewDataSource
 
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -54,6 +50,9 @@ class ImageGalleryCollectionViewController: UICollectionViewController, UICollec
         return cell
     }
     
+    var flowLayout: UICollectionViewFlowLayout? {
+        return collectionView?.collectionViewLayout as? UICollectionViewFlowLayout
+    }
     
     struct Constants {
         static let columnCount = 3.0
@@ -149,11 +148,13 @@ class ImageGalleryCollectionViewController: UICollectionViewController, UICollec
                     coordinator.drop(item.dragItem, toItemAt: destinationIndexPath)
                 }
             } else {
+                // handle the drop from the other app
                 let placeholderContext = coordinator.drop(item.dragItem, to: UICollectionViewDropPlaceholder(insertionIndexPath: destinationIndexPath, reuseIdentifier: "DropPlaceholderCell"))
                 
                 var optionalImageURL: URL?
                 var optionalAspectRatio: Double?
                 
+                // load image
                 item.dragItem.itemProvider.loadObject(ofClass: UIImage.self) { (image, error) in
                     DispatchQueue.main.async {
                         if let image = image as? UIImage {
@@ -162,6 +163,7 @@ class ImageGalleryCollectionViewController: UICollectionViewController, UICollec
                     }
                 }
                 
+                // load url
                 item.dragItem.itemProvider.loadObject(ofClass: NSURL.self) { (nsurl, error) in
                     DispatchQueue.main.async {
                         if let url = nsurl as? URL {
@@ -182,55 +184,3 @@ class ImageGalleryCollectionViewController: UICollectionViewController, UICollec
         }
     }
 }
-/*
-extension URL {
-    var imageURL: URL {
-        if let url = UIImage.urlToStoreLocallyAsJPEG(named: self.path) {
-            // this was created using UIImage.storeLocallyAsJPEG
-            return url
-        } else {
-            // check to see if there is an embedded imgurl reference
-            for query in query?.components(separatedBy: "&") ?? [] {
-                let queryComponents = query.components(separatedBy: "=")
-                if queryComponents.count == 2 {
-                    if queryComponents[0] == "imgurl", let url = URL(string: queryComponents[1].removingPercentEncoding ?? "") {
-                        return url
-                    }
-                }
-            }
-            return self.baseURL ?? self
-        }
-    }
-}
-
-extension UIImage
-{
-    private static let localImagesDirectory = "UIImage.storeLocallyAsJPEG"
-    
-    static func urlToStoreLocallyAsJPEG(named: String) -> URL? {
-        var name = named
-        let pathComponents = named.components(separatedBy: "/")
-        if pathComponents.count > 1 {
-            if pathComponents[pathComponents.count-2] == localImagesDirectory {
-                name = pathComponents.last!
-            } else {
-                return nil
-            }
-        }
-        if var url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
-            url = url.appendingPathComponent(localImagesDirectory)
-            do {
-                try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
-                url = url.appendingPathComponent(name)
-                if url.pathExtension != "jpg" {
-                    url = url.appendingPathExtension("jpg")
-                }
-                return url
-            } catch let error {
-                print("UIImage.urlToStoreLocallyAsJPEG \(error)")
-            }
-        }
-        return nil
-    }
-}
-*/
