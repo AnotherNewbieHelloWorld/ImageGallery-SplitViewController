@@ -20,6 +20,15 @@ class ImageGalleryCollectionViewController: UICollectionViewController, UICollec
         collectionView.dragDelegate = self
     }
     
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        flowLayout?.invalidateLayout()
+    }
+    
+    var flowLayout: UICollectionViewFlowLayout? {
+        collectionView?.collectionViewLayout as? UICollectionViewFlowLayout
+    }
+    
     // MARK: - UICollectionViewDataSource
 
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -37,13 +46,52 @@ class ImageGalleryCollectionViewController: UICollectionViewController, UICollec
                 if let aspectRatio = self?.images[indexPath.item].ascpectRatio,
                     aspectRatio < 0.95 || aspectRatio > 1.05 {
                     self?.images[indexPath.item].ascpectRatio = 1.0
+                    self?.flowLayout?.invalidateLayout()
                 }
             }
             imageCell.imageURL = images[indexPath.item].url
         }
         return cell
     }
+    
+    
+    struct Constants {
+        static let columnCount = 3.0
+        static let minWidthRatio = CGFloat(0.03)
+    }
+    
+    var boundsCollectionWidth: CGFloat {
+        return (collectionView?.bounds.width)!
+    }
+    
+    var gapItems: CGFloat {
+        return (flowLayout?.minimumInteritemSpacing)! * CGFloat((Constants.columnCount - 1.0))
+    }
+    
+    var gapSections: CGFloat {
+        return (flowLayout?.sectionInset.right)! * 2.0
+    }
+    
+    var scale: CGFloat = 1  {
+        didSet {
+            collectionView?.collectionViewLayout.invalidateLayout()
+        }
+    }
+    
+    var predefinedWidth: CGFloat {
+        let width = floor((boundsCollectionWidth - gapItems - gapSections) / CGFloat(Constants.columnCount)) * scale
+        return  min(max(width, boundsCollectionWidth * Constants.minWidthRatio), boundsCollectionWidth)}
+    
+    
+    // MARK: UICollectionViewDelegateFlowLayout
 
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let width = predefinedWidth
+        let aspectRatio = CGFloat(images[indexPath.item].ascpectRatio)
+        return CGSize(width: width, height: width / aspectRatio)
+    }
+    
+    
     // MARK: - Image Fetcher && Drag and Drop
     
     private func dragItems(at indexPath: IndexPath) -> [UIDragItem] {

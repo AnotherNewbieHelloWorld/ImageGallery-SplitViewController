@@ -59,21 +59,6 @@
                                 <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="0RX-gW-rXo">
                                     <rect key="frame" x="0.0" y="0.0" width="264" height="272"/>
                                     <autoresizingMask key="autoresizingMask"/>
-                                    <subviews>
-                                        <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="hm2-gr-Cqw">
-                                            <rect key="frame" x="122" y="126" width="20" height="20"/>
-                                            <color key="color" systemColor="systemOrangeColor" red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                        </activityIndicatorView>
-                                    </subviews>
-                                    <constraints>
-                                        <constraint firstItem="hm2-gr-Cqw" firstAttribute="centerX" secondItem="0RX-gW-rXo" secondAttribute="centerX" id="1WD-rc-5uW"/>
-                                        <constraint firstItem="hm2-gr-Cqw" firstAttribute="centerY" secondItem="0RX-gW-rXo" secondAttribute="centerY" id="zan-0N-hyC"/>
-                                    </constraints>
-                                    <variation key="default">
-                                        <mask key="subviews">
-                                            <exclude reference="hm2-gr-Cqw"/>
-                                        </mask>
-                                    </variation>
                                 </collectionViewCellContentView>
                             </collectionViewCell>
                         </cells>

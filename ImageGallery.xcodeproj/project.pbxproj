@@ -64,7 +64,6 @@
 			children = (
 				8505876824500AF000800D69 /* ImageGalleryCollectionViewController.swift */,
 				8505876A24500B1F00800D69 /* ImageGalleryCollectionViewCell.swift */,
-				856A194C245ADEE4004D5F7E /* Utilities.swift */,
 				85DD3C18245AA4C500582A36 /* Models */,
 				850587572450082B00800D69 /* Main.storyboard */,
 				850587652450085300800D69 /* Helpers */,
@@ -87,6 +86,7 @@
 		85DD3C18245AA4C500582A36 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				856A194C245ADEE4004D5F7E /* Utilities.swift */,
 				85DD3C16245AA47C00582A36 /* ImageModel.swift */,
 			);
 			path = Models;
