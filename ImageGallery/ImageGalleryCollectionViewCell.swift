@@ -26,16 +26,17 @@ class ImageGalleryCollectionViewCell: UICollectionViewCell {
             
             DispatchQueue.global(qos: .userInitiated).async {
                 let data = try? Data(contentsOf: url.imageURL)
-                DispatchQueue.main.async {
-                    if let data = data,
-                        url == self.imageURL,
-                        let image = UIImage(data: data) {
+                if let data = data, url == self.imageURL, let image = UIImage(data: data) {
+                    DispatchQueue.main.async {
+                        self.spinner.stopAnimating()
                         self.imageForCell.image = image
-                    } else {
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        self.spinner.stopAnimating()
                         self.imageForCell.image = UIImage(systemName: "photo")
                         self.changeAspectRatio?()
                     }
-                    self.spinner.stopAnimating()
                 }
             }
         }

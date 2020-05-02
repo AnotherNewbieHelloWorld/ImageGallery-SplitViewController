@@ -39,11 +39,11 @@ class ImageGalleryCollectionViewController: UICollectionViewController, UICollec
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath)
         if let imageCell = cell as? ImageGalleryCollectionViewCell {
             imageCell.changeAspectRatio = { [weak self] in
-                if let aspectRatio = self?.images[indexPath.item].ascpectRatio,
-                    aspectRatio < 0.95 || aspectRatio > 1.05 {
-                    self?.images[indexPath.item].ascpectRatio = 1.0
+//                if let aspectRatio = self?.images[indexPath.item].ascpectRatio {
+//                    , aspectRatio < 0.95 || aspectRatio > 1.05 {
+//                    self?.images[indexPath.item].ascpectRatio = 1.0
                     self?.flowLayout?.invalidateLayout()
-                }
+//                }
             }
             imageCell.imageURL = images[indexPath.item].url
         }
@@ -87,7 +87,7 @@ class ImageGalleryCollectionViewController: UICollectionViewController, UICollec
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let width = predefinedWidth
         let aspectRatio = CGFloat(images[indexPath.item].ascpectRatio)
-        return CGSize(width: width, height: width / aspectRatio)
+        return CGSize(width: width, height: width/aspectRatio)
     }
     
     
@@ -99,8 +99,9 @@ class ImageGalleryCollectionViewController: UICollectionViewController, UICollec
             let dragItem = UIDragItem(itemProvider: NSItemProvider(object: image))
             dragItem.localObject = images[indexPath.item]
             return [dragItem]
+        } else {
+            return []
         }
-        return []
     }
     
     func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
