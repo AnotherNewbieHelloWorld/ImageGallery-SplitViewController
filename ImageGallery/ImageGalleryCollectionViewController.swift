@@ -18,6 +18,7 @@ class ImageGalleryCollectionViewController: UICollectionViewController, UICollec
         super.viewDidLoad()
         collectionView.dropDelegate = self
         collectionView.dragDelegate = self
+        collectionView.addGestureRecognizer(UIPinchGestureRecognizer(target: self, action: #selector(ImageGalleryCollectionViewController.zoom(_:))))
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -48,6 +49,13 @@ class ImageGalleryCollectionViewController: UICollectionViewController, UICollec
             imageCell.imageURL = images[indexPath.item].url
         }
         return cell
+    }
+    
+    @objc func zoom(_ gesture: UIPinchGestureRecognizer) {
+        if gesture.state == .changed {
+            scale *= gesture.scale
+            gesture.scale = 1.0
+        }
     }
     
     var flowLayout: UICollectionViewFlowLayout? {
