@@ -25,18 +25,17 @@ class ImageGalleryCollectionViewCell: UICollectionViewCell {
             spinner.startAnimating()
             
             DispatchQueue.global(qos: .userInitiated).async {
-                let data = try? Data(contentsOf: url.imageURL)
-                if let data = data, url == self.imageURL, let image = UIImage(data: data) {
-                    DispatchQueue.main.async {
-                        self.spinner.stopAnimating()
+                let data = try? Data(contentsOf: url)
+                
+                DispatchQueue.main.async {
+                    if let imData = data, url == self.imageURL, let image = UIImage(data: imData) {
                         self.imageForCell.image = image
                     }
-                } else {
-                    DispatchQueue.main.async {
-                        self.spinner.stopAnimating()
-                        self.imageForCell.image = UIImage(systemName: "photo")
-                        self.changeAspectRatio?()
-                    }
+//                    else {
+//                        self.imageForCell.image = UIImage(systemName: "photo")
+//                        self.changeAspectRatio?()
+//                    }
+                    self.spinner.stopAnimating()
                 }
             }
         }

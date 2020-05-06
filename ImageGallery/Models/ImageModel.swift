@@ -12,3 +12,12 @@ struct ImageModel {
     var url: URL
     var ascpectRatio: Double
 }
+
+struct ImageGalleryModel {
+    var name: String
+    var images = [ImageModel]()
+    
+    init(withName name: String) {
+        self.name = name
+    }
+}
