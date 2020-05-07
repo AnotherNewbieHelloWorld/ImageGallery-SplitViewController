@@ -29,13 +29,13 @@ class ImageGalleryCollectionViewCell: UICollectionViewCell {
                 
                 DispatchQueue.main.async {
                     if let imData = data, url == self.imageURL, let image = UIImage(data: imData) {
+                        self.spinner.stopAnimating()
                         self.imageForCell.image = image
                     }
 //                    else {
 //                        self.imageForCell.image = UIImage(systemName: "photo")
 //                        self.changeAspectRatio?()
 //                    }
-                    self.spinner.stopAnimating()
                 }
             }
         }

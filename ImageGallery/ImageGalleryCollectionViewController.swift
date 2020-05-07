@@ -193,4 +193,25 @@ class ImageGalleryCollectionViewController: UICollectionViewController, UICollec
             }
         }
     }
+    
+    // MARK: - Navigation
+    
+//    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+//        performSegue(withIdentifier: "Show Image", sender: indexPath)
+//    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let identifier = segue.identifier {
+            switch identifier {
+            case "Show Image":
+                if let cell = sender as? ImageGalleryCollectionViewCell,
+                    let indexPath = collectionView.indexPath(for: cell),
+                    let seguedToMVC = segue.destination as? ImageViewController {
+                    seguedToMVC.imageURL = imageGallery.images[indexPath.item].url
+                }
+            default:
+                break
+            }
+        }
+    }
 }

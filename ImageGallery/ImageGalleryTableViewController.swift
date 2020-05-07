@@ -14,12 +14,7 @@ class ImageGalleryTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        imageGalleries = [
-            [ImageGalleryModel(withName: "Trees"),
-             ImageGalleryModel(withName: "Koalas"),
-             ImageGalleryModel(withName: "Memes")]
-            ,
-            [ImageGalleryModel(withName: "Deleted")]]
+        imageGalleries = [[ImageGalleryModel(withName: "The animals observatory")]]
         let image1 = ImageModel(url: URL(string: "https://www.theanimalsobservatory.com/media/wysiwyg/pages/SpringSummer2020/cadaques889-copia.jpg")!, ascpectRatio: 1.35)
         let image2 = ImageModel(url: URL(string:"https://www.theanimalsobservatory.com/media/wysiwyg/pages/SpringSummer2020/Copia-de-cadaques171-copia.jpg")!, ascpectRatio: 1.35)
         let image3 = ImageModel(url: URL(string:"https://www.theanimalsobservatory.com/media/wysiwyg/pages/SpringSummer2020/Copia-de-cadaques918-copia.jpg")!, ascpectRatio: 0.75)
@@ -119,6 +114,11 @@ class ImageGalleryTableViewController: UITableViewController {
         if editingStyle == .delete {
             switch indexPath.section {
             case 0:
+                if imageGalleries.count < 2 {
+                    let removedRow = imageGalleries[0].remove(at: indexPath.row)
+                    imageGalleries.insert([removedRow], at: 1)
+                    tableView.reloadData()
+                } else {
                 tableView.performBatchUpdates({
                     imageGalleries[1].insert(imageGalleries[0].remove(at: indexPath.row), at: 0)
                     tableView.deleteRows(at: [indexPath], with: .fade)
@@ -127,7 +127,7 @@ class ImageGalleryTableViewController: UITableViewController {
                     if self.imageGalleries.count > 0, self.imageGalleries[0].count > 0 {
                         self.selectRow(at: IndexPath(row: 0, section: 0))
                     }
-                })
+                })}
             case 1:
                 tableView.performBatchUpdates({
                     imageGalleries[1].remove(at: indexPath.row)
