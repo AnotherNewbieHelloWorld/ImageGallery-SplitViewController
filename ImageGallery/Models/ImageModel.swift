@@ -13,7 +13,7 @@ struct ImageModel {
     var ascpectRatio: Double
 }
 
-struct ImageGalleryModel {
+class ImageGalleryModel {
     var name: String
     var images = [ImageModel]()
     

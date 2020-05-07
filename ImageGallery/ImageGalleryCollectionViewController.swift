@@ -12,13 +12,7 @@ private let reuseIdentifier = "ImageCell"
 
 class ImageGalleryCollectionViewController: UICollectionViewController, UICollectionViewDropDelegate,UICollectionViewDragDelegate, UICollectionViewDelegateFlowLayout {
     
-    var imageGallery = ImageGalleryModel(withName: "newGallery") {
-        didSet {
-            if !(imageGallery as AnyObject === oldValue as AnyObject) {
-                collectionView?.reloadData()
-            }
-        }
-    }
+    var imageGallery = ImageGalleryModel(withName: "🌈")
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,7 +25,6 @@ class ImageGalleryCollectionViewController: UICollectionViewController, UICollec
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
-//        navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
         flowLayout?.invalidateLayout()
     }
 

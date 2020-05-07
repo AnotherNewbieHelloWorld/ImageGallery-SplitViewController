@@ -43,6 +43,13 @@ class ImageGalleryTableViewController: UITableViewController {
         }
     }
     
+    @IBAction func addNewGallery(_ sender: UIBarButtonItem) {
+        imageGalleries[0] += [ImageGalleryModel(withName: "Untitled")]
+        tableView.insertRows(at: [IndexPath(row: imageGalleries[0].count-1, section: 0)], with: .fade)
+        selectRow(at: IndexPath(row: imageGalleries[0].count-1, section: 0))
+    }
+    
+    
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -58,7 +65,6 @@ class ImageGalleryTableViewController: UITableViewController {
             let cell = tableView.dequeueReusableCell(withIdentifier: "Gallery Name Cell", for: indexPath)
             if let cell = cell as? IGTableViewCell {
                 cell.textField.text = imageGalleries[indexPath.section][indexPath.row].name
-                
                 cell.resignationHandler = { [weak self, unowned cell] in
                     if let newGalleryName = cell.textField.text {
                         self?.imageGalleries[indexPath.section][indexPath.row].name = newGalleryName
@@ -78,9 +84,62 @@ class ImageGalleryTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch section {
         case 1:
-            return imageGalleries.count > 0 ? "Recently Deleted" : nil
+            return imageGalleries[section].count > 0 ? "Recently Deleted" : nil
         default:
             return nil
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        if indexPath.section == 1 {
+            let lastIndex = self.imageGalleries[0].count
+            let undelete = UIContextualAction(
+                style: .normal,
+                title: "Undelete",
+                handler: { (contextAction, sourceView, completionHandler) in
+                    tableView.performBatchUpdates({
+                        self.imageGalleries[0]
+                            .insert(self.imageGalleries[1].remove(at: indexPath.row),at: lastIndex)
+                        tableView.deleteRows(at: [indexPath], with: .fade)
+                        tableView.insertRows(at: [IndexPath(row: lastIndex, section: 0)],
+                                             with: .automatic)
+                    }, completion: {finished in
+                        self.selectRow(at: IndexPath(row: lastIndex, section: 0),after: 0.5)
+                    })
+                    completionHandler(true)
+            })
+            undelete.backgroundColor = UIColor.blue
+            return UISwipeActionsConfiguration(actions: [undelete])
+        } else {
+            return nil
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            switch indexPath.section {
+            case 0:
+                tableView.performBatchUpdates({
+                    imageGalleries[1].insert(imageGalleries[0].remove(at: indexPath.row), at: 0)
+                    tableView.deleteRows(at: [indexPath], with: .fade)
+                    tableView.insertRows(at: [IndexPath(row: 0, section: 1)], with: .automatic)
+                }, completion: { finished in
+                    if self.imageGalleries.count > 0, self.imageGalleries[0].count > 0 {
+                        self.selectRow(at: IndexPath(row: 0, section: 0))
+                    }
+                })
+            case 1:
+                tableView.performBatchUpdates({
+                    imageGalleries[1].remove(at: indexPath.row)
+                    tableView.deleteRows(at: [indexPath], with: .fade)
+                }, completion: { finished in
+                    if self.imageGalleries[0].count > 0 {
+                        self.selectRow(at: IndexPath(row: 0, section: 0))
+                    }
+                })
+            default:
+                break
+            }
         }
     }
     
